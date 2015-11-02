@@ -117,5 +117,5 @@ function create_dataset(file_name,padding_size)
     return dataset
 end
 
-dataset = create_dataset("train.txt",2)
-print(dataset[1])
+dataset = torch.Tensor(create_dataset("train.txt",2))
+torch.save("data.t7",dataset)
