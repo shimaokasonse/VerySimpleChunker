@@ -1,4 +1,4 @@
-function create_encoder_decoder(file_name,column_num, min_freq) 
+function create_encoder_decoder(file_name,column_num, min_freq)
   
     ---- Processing File
     local f = io.open(file_name)
@@ -72,11 +72,7 @@ function pad(sentence,padding_size)
     return result
 end
 
-function create_dataset(file_name,padding_size)
-    local word_encoder,word_decoder = create_encoder_decoder(file_name,1,0)
-    local pos_encoder,pos_decoder = create_encoder_decoder(file_name,2,0)
-    local chunk_encoder,chunk_decoder = create_encoder_decoder(file_name,3,0)
-
+function create_dataset(file_name,padding_size,word_encoder,pos_encoder,chunk_encoder)
     local dataset = {}
     local f = io.open(file_name)
     local sentence = {}
@@ -117,5 +113,25 @@ function create_dataset(file_name,padding_size)
     return dataset
 end
 
-dataset = torch.Tensor(create_dataset("train.txt",2))
-torch.save("data.t7",dataset)
+
+--- MAIN
+local train_test_filename = "data/train+test.txt" 
+local train_filename = "data/train.txt"
+local test_filename = "data/test.txt"
+local padding_size = 3
+local min_freq = 1
+local word_encoder,word_decoder = create_encoder_decoder(train_test_filename ,1,min_freq)	
+local pos_encoder,pos_decoder = create_encoder_decoder(train_test_filename ,2,min_freq)
+local chunk_encoder,chunk_decoder = create_encoder_decoder(train_test_filename ,3,min_freq)
+local train_dataset = torch.Tensor(create_dataset(train_filename,padding_size,word_encoder,pos_encoder,chunk_encoder))
+local test_dataset = torch.Tensor(create_dataset(test_filename,padding_size,word_encoder,pos_encoder,chunk_encoder))
+dataset = {}
+dataset["train"] = train_dataset
+dataset["test"] = test_dataset
+dataset["word_encoder"] = word_encoder
+dataset["word_decoder"] = word_decoder
+dataset["pos_encoder"] = pos_encoder
+dataset["pos_decoder"] = pos_decoder
+dataset["chunk_encoder"] = chunk_encoder
+dataset["chunk_decoder"] = chunk_decoder
+torch.save("data/data.t7",dataset)
