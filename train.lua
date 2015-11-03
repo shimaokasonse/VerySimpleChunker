@@ -12,27 +12,29 @@ local context_size = data["padding_size"]*2 + 1
 local dimension = 10
 
 local train_inputs = train_dataset[{{},{1,context_size}}]
-local train_target =  train_dataset[{{},{context_size+1}}]:select(2,1)
+local train_target =  train_dataset[{{},{context_size+2}}]:select(2,1)
 
 local test_inputs = test_dataset[{{},{1,context_size}}]
-local test_target =  test_dataset[{{},{context_size+1}}]:select(2,1)
+local test_target =  test_dataset[{{},{context_size+2}}]:select(2,1)
 
 -- Model
-model = nn.Sequential()
+local model = nn.Sequential()
 model:add(nn.LookupTable(voc_size,dimension))
 model:add(nn.Reshape(dimension * context_size))
-model:add(nn.Linear(dimension * context_size,chunk_size))
+model:add(nn.Linear(dimension * context_size,30))
+model:add(nn.ReLU())
+model:add(nn.Linear(30,chunk_size))
 model:add(nn.LogSoftMax())
 
-criterion = nn.ClassNLLCriterion()
+local criterion = nn.ClassNLLCriterion()
 
-param, grad = model:getParameters()
-param:uniform(-0.01, 0.01)
+local param, grad = model:getParameters()
+param:uniform(-0.1, 0.1)
 
 -- Train
-batch_size = 200
-epoch = 0
-config = {LearningRate = 1, Mormentum=0.1}
+local batch_size = 100
+local epoch = 0
+local config = {LearningRate = 0.01, Mormentum=0.9}
 function train()
     epoch = (epoch or 0) + 1
     print("epoch"..epoch)
@@ -80,3 +82,4 @@ for i=1,500 do
     train()
     test()
 end
+torch.save("data/model.t7",model)
