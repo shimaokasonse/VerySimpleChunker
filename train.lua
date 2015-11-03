@@ -7,21 +7,20 @@ local data = torch.load("data/data.t7")
 local train_dataset = data["train"]
 local test_dataset = data["test"]
 local voc_size = #(data["word_decoder"])
-local chunk_size = #(data["chunk_decoder"])
-local context_size = 7
-local dimension = 6
+local chunk_size = #(data["pos_decoder"])
+local context_size = data["padding_size"]*2 + 1
+local dimension = 10
 
 local train_inputs = train_dataset[{{},{1,context_size}}]
-local train_target =  train_dataset[{{},{context_size+2}}]:select(2,1)
+local train_target =  train_dataset[{{},{context_size+1}}]:select(2,1)
 
 local test_inputs = test_dataset[{{},{1,context_size}}]
-local test_target =  test_dataset[{{},{context_size+2}}]:select(2,1)
+local test_target =  test_dataset[{{},{context_size+1}}]:select(2,1)
 
 -- Model
 model = nn.Sequential()
 model:add(nn.LookupTable(voc_size,dimension))
 model:add(nn.Reshape(dimension * context_size))
-model:add(nn.Dropout(0.5))
 model:add(nn.Linear(dimension * context_size,chunk_size))
 model:add(nn.LogSoftMax())
 
@@ -33,7 +32,7 @@ param:uniform(-0.01, 0.01)
 -- Train
 batch_size = 200
 epoch = 0
-config = {LearningRate = 1e-1, Mormentum=0.9}
+config = {LearningRate = 1, Mormentum=0.1}
 function train()
     epoch = (epoch or 0) + 1
     print("epoch"..epoch)

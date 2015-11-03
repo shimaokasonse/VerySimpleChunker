@@ -1,3 +1,5 @@
+util = require("util")
+
 function create_encoder_decoder(file_name,column_num, min_freq)
   
     ---- Processing File
@@ -43,34 +45,6 @@ function create_encoder_decoder(file_name,column_num, min_freq)
     
 end
     
-function pad(sentence,padding_size)
-    
-    local sent_with_padding = {}
-    local j = 1
-    for i = 1,padding_size do
-        sent_with_padding[j] = "<PAD>"
-        j = j + 1
-    end
-    for i = 1, #sentence do
-        sent_with_padding[j] = sentence[i]
-        j = j + 1
-    end
-     for i = 1,padding_size do
-        sent_with_padding[j] = "</PAD>"
-        j = j + 1
-    end
-    
-    result = {}
-    
-    for i = padding_size + 1, #sentence + padding_size do
-        local temp = {}
-        for k = -padding_size,padding_size do
-            table.insert(temp,sent_with_padding[i+k])
-        end
-        table.insert(result, temp)
-    end
-    return result
-end
 
 function create_dataset(file_name,padding_size,word_encoder,pos_encoder,chunk_encoder)
     local dataset = {}
@@ -86,7 +60,7 @@ function create_dataset(file_name,padding_size,word_encoder,pos_encoder,chunk_en
         local iob = temp[3]
         
         if not word and sentence then 
-            local words_with_ctx = pad(sentence,padding_size)
+            local words_with_ctx = util:pad(sentence,padding_size)
             for i = 1, #sentence do
                 local inputs_word_with_ctx  = words_with_ctx[i]
                 local data = {}
@@ -134,4 +108,5 @@ dataset["pos_encoder"] = pos_encoder
 dataset["pos_decoder"] = pos_decoder
 dataset["chunk_encoder"] = chunk_encoder
 dataset["chunk_decoder"] = chunk_decoder
+dataset["padding_size"] = padding_size
 torch.save("data/data.t7",dataset)
