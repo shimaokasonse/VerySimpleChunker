@@ -3,9 +3,15 @@
 ***VerySimpleChunker*** is an efficient, off-the-shelf shallow parser. 
 Trained on the CONLL-2000 shared-task, it achieved 91.2% accuracy.
 It has it’s strength in speed, thanks to high performance machine learning package Torch7 .
+### Requirement
+* lua ( > 5.2 )
+* Torch7
+
 ### Downloading
 `$git clone https://github.com/shimaokasonse/VerySimpleChunker`
+
 `$cd VerySimpleChunker`
+
 ### Parsing
 An example input (sample.txt) would look like as follows:
 
@@ -33,8 +39,11 @@ frameworks
 
 
 ```
+
 To parse this document, just run the following command:
+
 `$th parse.lua sample.txt > output.txt`
+
 The parsed document (output.txt) becomes:
 
 ```text:output.txt
@@ -63,4 +72,5 @@ frameworks	I-NP
 	
 
 ```
+
  That's it !!
